@@ -154,9 +154,29 @@ footer {
 }
 
 .participants-list {
-  list-style: disc;
-  margin-left: 20px;
+  /* hide default bullets and left margin so list looks cleaner */
+  list-style: none;
+  margin-left: 0;
   padding-left: 0;
+}
+
+/* delete (unregister) button next to each participant */
+.participant-delete {
+  background: transparent;
+  border: none;
+  color: #c62828;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.participant-delete:hover {
+  background: rgba(198, 40, 40, 0.08);
+}
+.participant-actions {
+  margin-left: auto; /* push actions to the right */
+  display: flex;
+  gap: 6px;
 }
 
 .participant-item {

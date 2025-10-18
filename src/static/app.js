@@ -50,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
           details.participants.forEach((p) => {
             const li = document.createElement("li");
             li.className = "participant-item";
+            li.dataset.email = p;
+            li.dataset.activity = name;
 
             const avatar = document.createElement("span");
             avatar.className = "avatar";
@@ -64,6 +66,47 @@ document.addEventListener("DOMContentLoaded", () => {
             const nameSpan = document.createElement("span");
             nameSpan.className = "participant-name";
             nameSpan.textContent = p;
+
+            // actions container (delete button)
+            const actions = document.createElement("span");
+            actions.className = "participant-actions";
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.className = "participant-delete";
+            deleteBtn.title = "Unregister participant";
+            // simple trash unicode icon — avoids adding image assets
+            deleteBtn.innerHTML = "&#128465;";
+
+            deleteBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const activityName = li.dataset.activity;
+              const email = li.dataset.email;
+
+              // optimistic UI: remove immediately
+              li.remove();
+
+              try {
+                const resp = await fetch(`/activities/${encodeURIComponent(activityName)}/unregister?email=${encodeURIComponent(email)}`, {
+                  method: "POST",
+                });
+
+                if (!resp.ok) {
+                  // if failed, re-fetch activities to restore state and show error
+                  await fetchActivities();
+                  const err = await resp.json().catch(() => ({}));
+                  alert(err.detail || "Failed to unregister participant");
+                }
+              } catch (err) {
+                // on network error, re-fetch to restore and notify
+                await fetchActivities();
+                console.error("Error unregistering participant:", err);
+                alert("Network error while unregistering participant");
+              }
+            });
+
+            actions.appendChild(deleteBtn);
+            li.appendChild(actions);
 
             li.appendChild(avatar);
             li.appendChild(nameSpan);
